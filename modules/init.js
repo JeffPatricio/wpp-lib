@@ -7,14 +7,10 @@ import {
   getProfileInfo,
 } from "./process";
 
-window.libVersion = "2.0";
+const VERSION = "2.1.0";
 
 window.emit = (name, data) => {
   window.dispatchEvent(new CustomEvent(name, { detail: data }));
-};
-
-console.wa = (text) => {
-  console.log(`%c ${text}`, "background: #25D366; color: #000000");
 };
 
 const client = new Client();
@@ -35,8 +31,8 @@ const registerEvents = () => {
 client.on("ready", () => {
   window.waClient = client;
   registerEvents();
-  console.wa("INITIALIZE WA LIBRARY ✅");
-  window.emit("wa-build");
+  console.log(`INITIALIZE WA LIBRARY ${VERSION} ✅`);
+  window.emit("wa-build", VERSION);
 });
 
 client.initialize();
