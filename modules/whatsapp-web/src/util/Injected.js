@@ -1,15 +1,11 @@
 const ExposeStore = (moduleRaid) => {
   window.mR = moduleRaid();
-
   window.Store = Object.assign(
     {},
-    window.mR.findModule("Chat").find((a) => typeof a.default != "undefined")
-      .default
+    window.mR.findModule((m) => m.default && m.default.Chat)[0].default
   );
   window.Store.AppState = window.mR.findModule("Socket")[0].Socket;
-  window.Store.Conn = window.mR
-    .findModule("Conn")
-    .find((a) => typeof a.Conn != "undefined").Conn;
+  window.Store.Conn = window.mR.findModule("Conn")[0].Conn;
   window.Store.BlockContact = window.mR.findModule("blockContact")[0];
   window.Store.Call = window.mR.findModule("CallCollection")[0].CallCollection;
   window.Store.Cmd = window.mR.findModule("Cmd")[0].Cmd;
@@ -22,7 +18,9 @@ const ExposeStore = (moduleRaid) => {
     (module) => module.default && module.default.handlePendingInvite
   )[0].default;
   window.Store.Invite = window.mR.findModule("sendJoinGroupViaInvite")[0];
-  window.Store.Label = window.mR.findModule("LabelCollection")[0].default;
+  window.Store.InviteInfo = window.mR.findModule("sendQueryGroupInvite")[0];
+  window.Store.Label =
+    window.mR.findModule("LabelCollection")[0].LabelCollection;
   window.Store.MediaPrep = window.mR.findModule("MediaPrep")[0];
   window.Store.MediaObject = window.mR.findModule("getOrCreateMediaObject")[0];
   window.Store.NumberInfo = window.mR.findModule("formattedPhoneNumber")[0];
@@ -31,16 +29,22 @@ const ExposeStore = (moduleRaid) => {
   window.Store.MsgKey = window.mR.findModule(
     (module) => module.default && module.default.fromString
   )[0].default;
+  window.Store.MessageInfo = window.mR.findModule("sendQueryMsgInfo")[0];
   window.Store.OpaqueData = window.mR.findModule(
     (module) => module.default && module.default.createFromData
   )[0].default;
-  window.Store.QueryExist = window.mR.findModule("queryExist")[0].queryExist;
+  window.Store.QueryExist = window.mR.findModule(
+    (module) =>
+      typeof module.default === "function" &&
+      module.default.toString().includes("Should not reach queryExists MD")
+  )[0].default;
   window.Store.QueryProduct = window.mR.findModule("queryProduct")[0];
   window.Store.QueryOrder = window.mR.findModule("queryOrder")[0];
   window.Store.SendClear = window.mR.findModule("sendClear")[0];
   window.Store.SendDelete = window.mR.findModule("sendDelete")[0];
   window.Store.SendMessage = window.mR.findModule("addAndSendMsgToChat")[0];
   window.Store.SendSeen = window.mR.findModule("sendSeen")[0];
+  window.Store.Sticker = window.mR.findModule("Sticker")[0].Sticker;
   window.Store.User = window.mR.findModule("getMaybeMeUser")[0];
   window.Store.UploadUtils = window.mR.findModule((module) =>
     module.default && module.default.encryptAndUpload ? module.default : null
@@ -64,9 +68,21 @@ const ExposeStore = (moduleRaid) => {
   window.Store.GroupParticipants = window.mR.findModule(
     "sendPromoteParticipants"
   )[0];
+  window.Store.JoinInviteV4 = window.mR.findModule(
+    "sendJoinGroupViaInviteV4"
+  )[0];
+  window.Store.findCommonGroups =
+    window.mR.findModule("findCommonGroups")[0].findCommonGroups;
+  window.Store.StatusUtils = window.mR.findModule("setMyStatus")[0];
+  window.Store.StickerTools = {
+    ...window.mR.findModule("toWebpSticker")[0],
+    ...window.mR.findModule("addWebpMetadata")[0],
+  };
+
   window.Store.GroupUtils = {
     ...window.mR.findModule("sendCreateGroup")[0],
     ...window.mR.findModule("sendSetGroupSubject")[0],
+    ...window.mR.findModule("markExited")[0],
   };
 
   if (!window.Store.Chat._find) {
