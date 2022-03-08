@@ -1,1 +1,1383 @@
-!function(){"use strict";function d(){d.mID=Math.random().toString(36).substring(7),d.mObj={};try{window.webpackChunkwhatsapp_web_client.push([[d.mID],{},function(t){Object.keys(t.m).forEach(function(e){d.mObj[e]=t(e)})}])}catch(e){}return{modules:d.mObj,constructors:d.cArr,findModule:function(n){var a=[];return Object.keys(d.mObj).forEach(function(e){var t=d.mObj[e];if(void 0!==t)if("string"==typeof n){if("object"==typeof t.default)for(var i in t.default)i==n&&a.push(t);for(var o in t)o==n&&a.push(t)}else{if("function"!=typeof n)throw new TypeError("findModule can only find via string and function, "+typeof n+" was passed");n(t)&&a.push(t)}}),a},get:function(e){return d.mObj[e]}}}const i={AUTHENTICATED:"authenticated",AUTHENTICATION_FAILURE:"auth_failure",READY:"ready",MESSAGE_RECEIVED:"message",MESSAGE_CREATE:"message_create",MESSAGE_REVOKED_EVERYONE:"message_revoke_everyone",MESSAGE_REVOKED_ME:"message_revoke_me",MESSAGE_ACK:"message_ack",MEDIA_UPLOADED:"media_uploaded",GROUP_JOIN:"group_join",GROUP_LEAVE:"group_leave",GROUP_UPDATE:"group_update",QR_RECEIVED:"qr",DISCONNECTED:"disconnected",STATE_CHANGED:"change_state",BATTERY_CHANGED:"change_battery",INCOMING_CALL:"incoming_call"},t={TEXT:"chat",AUDIO:"audio",VOICE:"ptt",IMAGE:"image",VIDEO:"video",DOCUMENT:"document",STICKER:"sticker",LOCATION:"location",CONTACT_CARD:"vcard",CONTACT_CARD_MULTI:"multi_vcard",ORDER:"order",REVOKED:"revoked",PRODUCT:"product",UNKNOWN:"unknown",GROUP_INVITE:"groups_v4_invite",LIST:"list",BUTTONS_RESPONSE:"buttons_response",PAYMENT:"payment"};class e{constructor(e){Object.defineProperty(this,"client",{value:e})}_clone(){return Object.assign(Object.create(this),this)}_patch(e){return e}}class o extends e{constructor(e,t){super(e),t&&this._patch(t)}_patch(e){return this.id=e.id,this.number=e.userid,this.isBusiness=e.isBusiness,this.isEnterprise=e.isEnterprise,this.labels=e.labels,this.name=e.name,this.pushname=e.pushname,this.sectionHeader=e.sectionHeader,this.shortName=e.shortName,this.statusMute=e.statusMute,this.type=e.type,this.verifiedLevel=e.verifiedLevel,this.verifiedName=e.verifiedName,this.isMe=e.isMe,this.isUser=e.isUser,this.isGroup=e.isGroup,this.isWAContact=e.isWAContact,this.isMyContact=e.isMyContact,this.isBlocked=e.isBlocked,super._patch(e)}async getProfilePicUrl(){return this.client.getProfilePicUrl(this.id._serialized)}async getAbout(){var e=await window.Store.Wap.statusFind(this.id._serialized);return"string"!=typeof e.status?null:e.status}}class n extends o{}class a extends o{_patch(e){return this.businessProfile=e.businessProfile,super._patch(e)}}class s extends e{constructor(e,t){super(e),t&&this._patch(t)}_patch(e){return this.pushname=e.pushname,this.wid=e.wid,this.me=e.wid,this.platform=e.platform,super._patch(e)}}class r{constructor(e,t,i){this.latitude=e,this.longitude=t,this.description=i}}class w{constructor(e,t,i){this.mimetype=e,this.data=t,this.filename=i}}class l extends e{constructor(e,t){super(e),t&&this._patch(t)}_patch(e){return this.mediaKey=e.mediaKey,this.id=e.id,this.ack=e.ack,this.hasMedia=!(!e.clientUrl&&!e.deprecatedMms3Url),this.body=this.hasMedia?e.caption||"":e.body||"",this.type=e.type,this.timestamp=e.t,this.from="object"==typeof e.from&&null!==e.from?e.from._serialized:e.from,this.to="object"==typeof e.to&&null!==e.to?e.to._serialized:e.to,this.author="object"==typeof e.author&&null!==e.author?e.author._serialized:e.author,this.isForwarded=e.isForwarded,this.isStatus=e.isStatusV3,this.isStarred=e.star,this.broadcast=e.broadcast,this.fromMe=e.id.fromMe,this.hasQuotedMsg=!!e.quotedMsg,this.location=e.type===t.LOCATION?new r(e.lat,e.lng,e.loc):void 0,this.vCards=e.type===t.CONTACT_CARD_MULTI?e.vcardList.map(e=>e.vcard):e.type===t.CONTACT_CARD?[e.body]:[],this.mentionedIds=[],e.mentionedJidList&&(this.mentionedIds=e.mentionedJidList),this.links=e.links,super._patch(e)}_getChatId(){return this.fromMe?this.to:this.from}getContact(){return this.client.getContactById(this.author||this.from)}async getMentions(){return Promise.all(this.mentionedIds.map(async e=>this.client.getContactById(e)))}async getQuotedMessage(){if(this.hasQuotedMsg){let e=window.Store.Msg.get(this.id._serialized);var t=e.quotedMsgObj().serialize();return new l(this.client,t)}}async reply(e,t,i={}){return t=t||this._getChatId(),i={...i,quotedMessageId:this.id._serialized},this.client.sendMessage(t,e,i)}}(class M{});async function c(e){try{const i={};e.detail.quotedMessageId&&(i.quotedMessageId=e.detail.quotedMessageId);var t=await window.waClient.sendMessage(e.detail.number+"@c.us",e.detail.text,i);window.emit("send-text@response",{success:!0,id:t.id._serialized})}catch(e){window.emit("send-text@response",{success:!1,error:e.toString(),message:"Erro ao enviar mensagem na extensão"})}}async function u(e){try{var t=new r(parseFloat(e.detail.location.lat),parseFloat(e.detail.location.lng),e.detail.location.description),i=await window.waClient.sendMessage(e.detail.number+"@c.us",t);window.emit("send-location@response",{success:!0,id:i.id._serialized})}catch(e){window.emit("send-location@response",{success:!1,error:e.toString(),message:"Erro ao enviar mensagem na extensão"})}}async function m(e){try{var t=new w(e.detail.video.mimetype,e.detail.video.data,e.detail.video.filename),i=await window.waClient.sendMessage(e.detail.number+"@c.us",t);window.emit("send-video@response",{success:!0,id:i.id._serialized})}catch(e){window.emit("send-video@response",{success:!1,error:e.toString(),message:"Erro ao enviar mensagem na extensão"})}}async function p(e){try{var t=new w(e.detail.image.mimetype,e.detail.image.data,e.detail.image.filename),i=await window.waClient.sendMessage(e.detail.number+"@c.us",t);window.emit("send-image@response",{success:!0,id:i.id._serialized})}catch(e){window.emit("send-image@response",{success:!1,error:e.toString(),message:"Erro ao enviar mensagem na extensão"})}}async function f(e){try{const i=await window.waClient.getContactById(e.detail.number+"@c.us");var t=await i.getProfilePicUrl();window.emit("contact-info@response",{success:!0,pushname:i.pushname||"",name:i.name||"",shortName:i.shortName||"",pictureUrl:t||""})}catch(e){window.emit("contact-info@response",{success:!1,error:e.toString(),message:"Erro ao buscar dados do contato"})}}const h="2.1.0",S=(window.emit=(e,t)=>{window.dispatchEvent(new CustomEvent(e,{detail:t}))},new class extends class{constructor(){this.callbacks={}}on(e,t){this.callbacks[e]||(this.callbacks[e]=[]),this.callbacks[e].push(t)}emit(e,t){let i=this.callbacks[e];i&&i.forEach(e=>e(t))}}{constructor(){super()}async initialize(){var e;e=d,window.mR=e(),window.Store=Object.assign({},window.mR.findModule("Chat").find(e=>void 0!==e.default).default),window.Store.AppState=window.mR.findModule("Socket")[0].Socket,window.Store.Conn=window.mR.findModule("Conn").find(e=>void 0!==e.Conn).Conn,window.Store.BlockContact=window.mR.findModule("blockContact")[0],window.Store.Call=window.mR.findModule("CallCollection")[0].CallCollection,window.Store.Cmd=window.mR.findModule("Cmd")[0].Cmd,window.Store.CryptoLib=window.mR.findModule("decryptE2EMedia")[0],window.Store.DownloadManager=window.mR.findModule("downloadManager")[0].downloadManager,window.Store.Features=window.mR.findModule("FEATURE_CHANGE_EVENT")[0].GK,window.Store.genId=window.mR.findModule("randomId")[0].randomId,window.Store.GroupMetadata=window.mR.findModule(e=>e.default&&e.default.handlePendingInvite)[0].default,window.Store.Invite=window.mR.findModule("sendJoinGroupViaInvite")[0],window.Store.Label=window.mR.findModule("LabelCollection")[0].default,window.Store.MediaPrep=window.mR.findModule("MediaPrep")[0],window.Store.MediaObject=window.mR.findModule("getOrCreateMediaObject")[0],window.Store.NumberInfo=window.mR.findModule("formattedPhoneNumber")[0],window.Store.MediaTypes=window.mR.findModule("msgToMediaType")[0],window.Store.MediaUpload=window.mR.findModule("uploadMedia")[0],window.Store.MsgKey=window.mR.findModule(e=>e.default&&e.default.fromString)[0].default,window.Store.OpaqueData=window.mR.findModule(e=>e.default&&e.default.createFromData)[0].default,window.Store.QueryExist=window.mR.findModule("queryExist")[0].queryExist,window.Store.QueryProduct=window.mR.findModule("queryProduct")[0],window.Store.QueryOrder=window.mR.findModule("queryOrder")[0],window.Store.SendClear=window.mR.findModule("sendClear")[0],window.Store.SendDelete=window.mR.findModule("sendDelete")[0],window.Store.SendMessage=window.mR.findModule("addAndSendMsgToChat")[0],window.Store.SendSeen=window.mR.findModule("sendSeen")[0],window.Store.User=window.mR.findModule("getMaybeMeUser")[0],window.Store.UploadUtils=window.mR.findModule(e=>e.default&&e.default.encryptAndUpload?e.default:null)[0].default,window.Store.UserConstructor=window.mR.findModule(e=>e.default&&e.default.prototype&&e.default.prototype.isServer&&e.default.prototype.isUser?e.default:null)[0].default,window.Store.Validators=window.mR.findModule("findLinks")[0],window.Store.VCard=window.mR.findModule("vcardFromContactModel")[0],window.Store.Wap=window.mR.findModule("queryLinkPreview")[0].default,window.Store.WidFactory=window.mR.findModule("createWid")[0],window.Store.getProfilePicFull=window.mR.findModule("getProfilePicFull")[0].getProfilePicFull,window.Store.PresenceUtils=window.mR.findModule("sendPresenceAvailable")[0],window.Store.ChatState=window.mR.findModule("sendChatStateComposing")[0],window.Store.GroupParticipants=window.mR.findModule("sendPromoteParticipants")[0],window.Store.GroupUtils={...window.mR.findModule("sendCreateGroup")[0],...window.mR.findModule("sendSetGroupSubject")[0]},await(!window.Store.Chat._find&&!(window.Store.Chat._find=e=>{var t=window.Store.Chat.get(e);return t?Promise.resolve(t):Promise.resolve({id:e})})),window.WWebJS={},window.WWebJS.sendSeen=async e=>{e=window.Store.Chat.get(e);return void 0!==e&&(await window.Store.SendSeen.sendSeen(e,!1),!0)},window.WWebJS.sendMessage=async(t,i,o={})=>{let e={},n=(o.attachment&&(e=o.sendMediaAsSticker?await window.WWebJS.processStickerData(o.attachment):await window.WWebJS.processMediaData(o.attachment,{forceVoice:o.sendAudioAsVoice,forceDocument:o.sendMediaAsDocument,forceGif:o.sendVideoAsGif}),i=o.sendMediaAsSticker?void 0:e.preview,delete o.attachment,delete o.sendMediaAsSticker),{});if(o.quotedMessageId){let e=window.Store.Msg.get(o.quotedMessageId);e.canReply()&&(n=e.msgContextInfo(t)),delete o.quotedMessageId}o.mentionedJidList&&(o.mentionedJidList=o.mentionedJidList.map(e=>window.Store.Contact.get(e).id));let a={},d=(o.location&&(a={type:"location",loc:o.location.description,lat:o.location.latitude,lng:o.location.longitude},delete o.location),{});if(o.contactCard){var s=window.Store.Contact.get(o.contactCard);d={body:window.Store.VCard.vcardFromContactModel(s).vcard,type:"vcard",vcardFormattedName:s.formattedName},delete o.contactCard}else if(o.contactCardList){let e=o.contactCardList.map(e=>window.Store.Contact.get(e));s=e.map(e=>window.Store.VCard.vcardFromContactModel(e));d={type:"multi_vcard",vcardList:s,body:void 0},delete o.contactCardList}else if(o.parseVCards&&"string"==typeof i&&i.startsWith("BEGIN:VCARD")){delete o.parseVCards;try{var r=window.Store.VCard.parseVcard(i);r&&(d={type:"vcard",vcardFormattedName:window.Store.VCard.vcardGetNameFromParsed(r)})}catch(e){}}o.linkPreview&&delete o.linkPreview;let w={};if(o.buttons){let e;e="chat"===o.buttons.type?i=o.buttons.body:o.caption||" ",w={productHeaderImageRejected:!1,isFromTemplate:!1,isDynamicReplyButtonsMsg:!0,title:o.buttons.title||void 0,footer:o.buttons.footer||void 0,dynamicReplyButtons:o.buttons.buttons,replyButtons:o.buttons.buttons,caption:e},delete o.buttons}if(o.list){if("smba"===window.Store.Conn.platform||"smbi"===window.Store.Conn.platform)throw"[LT01] Whatsapp business can't send this yet";w={...w,type:"list",footer:o.list.footer,list:{...o.list,listType:1},body:o.list.description},delete o.list,delete w.list.footer}s=new window.Store.MsgKey({fromMe:!0,remote:t.id,id:window.Store.genId()}),r={...o,id:s,ack:0,body:i,from:window.Store.User.getMeUser(),to:t.id,local:!0,self:"out",t:parseInt((new Date).getTime()/1e3),isNewMsg:!0,type:"chat",...a,...e,...n,...d,...w};return await window.Store.SendMessage.addAndSendMsgToChat(t,r),window.Store.Msg.get(s._serialized)},window.WWebJS.processMediaData=async(e,{forceVoice:t,forceDocument:i,forceGif:o})=>{e=window.WWebJS.mediaInfoToFile(e),e=await window.Store.OpaqueData.createFromData(e,e.type);const n=window.Store.MediaPrep.prepRawMedia(e,{asDocument:i}),a=await n.waitForPrep(),d=window.Store.MediaObject.getOrCreateMediaObject(a.filehash);e=window.Store.MediaTypes.msgToMediaType({type:a.type,isGif:a.isGif}),t&&"audio"===a.type&&(a.type="ptt"),o&&"video"===a.type&&(a.isGif=!0),i&&(a.type="document"),a.mediaBlob instanceof window.Store.OpaqueData||(a.mediaBlob=await window.Store.OpaqueData.createFromData(a.mediaBlob,a.mediaBlob.type)),a.renderableUrl=a.mediaBlob.url(),d.consolidate(a.toJSON()),a.mediaBlob.autorelease(),t=await window.Store.MediaUpload.uploadMedia({mimetype:a.mimetype,mediaObject:d,mediaType:e}),o=t.mediaEntry;if(o)return a.set({clientUrl:o.mmsUrl,deprecatedMms3Url:o.deprecatedMms3Url,directPath:o.directPath,mediaKey:o.mediaKey,mediaKeyTimestamp:o.mediaKeyTimestamp,filehash:d.filehash,encFilehash:o.encFilehash,uploadhash:o.uploadHash,size:d.size,streamingSidecar:o.sidecar,firstFrameSidecar:o.firstFrameSidecar}),a;throw new Error("upload failed: media entry was not created")},window.WWebJS.getMessageModel=e=>{const t=e.serialize();return t.isStatusV3=e.isStatusV3,t.links=e.getLinks().map(e=>({link:e.href,isSuspicious:Boolean(e.suspiciousCharacters&&e.suspiciousCharacters.size)})),t.buttons&&(t.buttons=t.buttons.serialize()),t.dynamicReplyButtons&&(t.dynamicReplyButtons=JSON.parse(JSON.stringify(t.dynamicReplyButtons))),t.replyButtons&&(t.replyButtons=JSON.parse(JSON.stringify(t.replyButtons))),delete t.pendingAckUpdate,t},window.WWebJS.getChatModel=async e=>{let t=e.serialize();var i;return t.isGroup=e.isGroup,t.formattedTitle=e.formattedTitle,t.isMuted=e.mute&&e.mute.isMuted,e.groupMetadata&&(i=window.Store.WidFactory.createWid(e.id._serialized),await window.Store.GroupMetadata.update(i),t.groupMetadata=e.groupMetadata.serialize()),delete t.msgs,delete t.msgUnsyncedButtonReplyMsgs,delete t.unsyncedButtonReplies,t},window.WWebJS.getChat=async e=>{e=window.Store.WidFactory.createWid(e),e=await window.Store.Chat.find(e);return window.WWebJS.getChatModel(e)},window.WWebJS.getContactModel=e=>{let t=e.serialize();return t.isBusiness=e.isBusiness,e.businessProfile&&(t.businessProfile=e.businessProfile.serialize()),t.isMe=e.isMe,t.isUser=e.isUser,t.isGroup=e.isGroup,t.isWAContact=e.isWAContact,t.isMyContact=e.isMyContact,t.isBlocked=e.isContactBlocked,t.userid=e.userid,t},window.WWebJS.getContact=async e=>{e=window.Store.WidFactory.createWid(e),e=await window.Store.Contact.find(e);return window.WWebJS.getContactModel(e)},window.WWebJS.getContacts=()=>{const e=window.Store.Contact.models;return e.map(e=>window.WWebJS.getContactModel(e))},window.WWebJS.mediaInfoToFile=({data:e,mimetype:t,filename:i})=>{const o=atob(e);e=new ArrayBuffer(o.length);const n=new Uint8Array(e);for(let e=0;e<o.length;e++)n[e]=o.charCodeAt(e);e=new Blob([e],{type:t});return new File([e],i,{type:t,lastModified:Date.now()})},window.WWebJS.arrayBufferToBase64=e=>{let t="";var i=new Uint8Array(e),o=i.byteLength;for(let e=0;e<o;e++)t+=String.fromCharCode(i[e]);return window.btoa(t)},window.WWebJS.getFileHash=async e=>{e=await e.arrayBuffer(),e=await crypto.subtle.digest("SHA-256",e);return btoa(String.fromCharCode(...new Uint8Array(e)))},window.WWebJS.generateHash=async e=>{for(var t="",i="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",o=i.length,n=0;n<e;n++)t+=i.charAt(Math.floor(Math.random()*o));return t},window.WWebJS.sendClearChat=async e=>{e=window.Store.Chat.get(e);return void 0!==e&&(await window.Store.SendClear.sendClear(e,!1),!0)},window.WWebJS.sendDeleteChat=async e=>{e=window.Store.Chat.get(e);return void 0!==e&&(await window.Store.SendDelete.sendDelete(e),!0)},window.WWebJS.sendChatstate=async(e,t)=>{switch(e){case"typing":await window.Store.Wap.sendChatstateComposing(t);break;case"recording":await window.Store.Wap.sendChatstateRecording(t);break;case"stop":await window.Store.Wap.sendChatstatePaused(t);break;default:throw"Invalid chatstate"}return!0},window.WWebJS.getLabelModel=e=>{let t=e.serialize();return t.hexColor=e.hexColor,t},window.WWebJS.getLabels=()=>{const e=window.Store.Label.models;return e.map(e=>window.WWebJS.getLabelModel(e))},window.WWebJS.getLabel=e=>{e=window.Store.Label.get(e);return window.WWebJS.getLabelModel(e)},window.WWebJS.getChatLabels=async e=>{const t=await window.WWebJS.getChat(e);return(t.labels||[]).map(e=>window.WWebJS.getLabel(e))},window.WWebJS.getOrderDetail=async(e,t)=>window.Store.QueryOrder.queryOrder(e,80,80,t),window.WWebJS.getProductMetadata=async e=>{var t=window.Store.Conn.wid,t=await window.Store.QueryProduct.queryProduct(t,e);if(t&&t.data)return t.data},this.info=new s(this,{...window.Store.Conn.serialize(),wid:window.Store.User.getMeUser()}),window.onAddMessageEvent=e=>{var t;e.isNewMsg&&(t=new l(this,e),e.id.fromMe||this.emit(i.MESSAGE_RECEIVED,t))},window.Store.Msg.on("add",e=>{e.isNewMsg&&window.onAddMessageEvent(window.WWebJS.getMessageModel(e))}),setTimeout(()=>{this.emit(i.READY)},2e3)}async sendSeen(e){return await window.WWebJS.sendSeen(e)}async sendMessage(e,t,i={}){let o={linkPreview:!0,sendAudioAsVoice:i.sendAudioAsVoice,sendMediaAsSticker:i.sendMediaAsSticker,sendMediaAsDocument:i.sendMediaAsDocument,caption:i.caption,quotedMessageId:i.quotedMessageId,parseVCards:!1!==i.parseVCards,mentionedJidList:Array.isArray(i.mentions)?i.mentions.map(e=>e.id._serialized):[]};var n=void 0===i.sendSeen||i.sendSeen,i=(t instanceof w?(o.attachment=t,t=""):i.media instanceof w?(o.attachment=i.media,o.caption=t,t=""):t instanceof r&&(o.location=t,t=""),window.Store.WidFactory.createWid(e)),i=await window.Store.Chat.find(i);n&&window.WWebJS.sendSeen(e);const a=await window.WWebJS.sendMessage(i,t,o,n);e=a.serialize();return new l(this,e)}async getContactById(e){e=await window.WWebJS.getContact(e);return class{static create(e,t){return new(t.isBusiness?a:n)(e,t)}}.create(this,e)}async getProfilePicUrl(e){e=await window.Store.WidFactory.createWid(e),e=await window.Store.getProfilePicFull(e);return e?e.eurl:void 0}});function g(){window.emit("wa-info@response",S.info.wid)}S.on("ready",()=>{window.waClient=S,window.addEventListener("wa-info",g,!1),window.addEventListener("send-text",c,!1),window.addEventListener("send-location",u,!1),window.addEventListener("send-image",p,!1),window.addEventListener("send-video",m,!1),window.addEventListener("contact-info",f,!1),console.log(`INITIALIZE WA LIBRARY ${h} ✅`),window.emit("wa-build",h)}),S.initialize()}();
+(function () {
+  'use strict';
+
+  /* moduleRaid v5
+   * https://github.com/@pedroslopez/moduleRaid
+   *
+   * Copyright pixeldesu, pedroslopez and other contributors
+   * Licensed under the MIT License
+   * https://github.com/pedroslopez/moduleRaid/blob/master/LICENSE
+   */
+  const moduleRaid = function () {
+    moduleRaid.mID = Math.random().toString(36).substring(7);
+    moduleRaid.mObj = {};
+
+    var fillModuleArray = function () {
+      try {
+        window.webpackChunkwhatsapp_web_client.push([[moduleRaid.mID], {}, function (e) {
+          Object.keys(e.m).forEach(function (mod) {
+            moduleRaid.mObj[mod] = e(mod);
+          });
+        }]);
+      } catch (err) {}
+    };
+
+    fillModuleArray();
+
+    var get = function get(id) {
+      return moduleRaid.mObj[id];
+    };
+
+    var findModule = function findModule(query) {
+      var results = [];
+      var modules = Object.keys(moduleRaid.mObj);
+      modules.forEach(function (mKey) {
+        var mod = moduleRaid.mObj[mKey];
+
+        if (typeof mod !== 'undefined') {
+          if (typeof query === 'string') {
+            if (typeof mod.default === 'object') {
+              for (let key in mod.default) {
+                if (key == query) results.push(mod);
+              }
+            }
+
+            for (let key in mod) {
+              if (key == query) results.push(mod);
+            }
+          } else if (typeof query === 'function') {
+            if (query(mod)) {
+              results.push(mod);
+            }
+          } else {
+            throw new TypeError('findModule can only find via string and function, ' + typeof query + ' was passed');
+          }
+        }
+      });
+      return results;
+    };
+
+    return {
+      modules: moduleRaid.mObj,
+      constructors: moduleRaid.cArr,
+      findModule: findModule,
+      get: get
+    };
+  };
+
+  class EventEmitter {
+    constructor() {
+      this.callbacks = {};
+    }
+
+    on(event, cb) {
+      if (!this.callbacks[event]) this.callbacks[event] = [];
+      this.callbacks[event].push(cb);
+    }
+
+    emit(event, data) {
+      let cbs = this.callbacks[event];
+
+      if (cbs) {
+        cbs.forEach(cb => cb(data));
+      }
+    }
+
+  }
+
+  /**
+   * Client status
+   * @readonly
+   * @enum {number}
+   */
+  /**
+   * Events that can be emitted by the client
+   * @readonly
+   * @enum {string}
+   */
+
+  const Events = {
+    AUTHENTICATED: 'authenticated',
+    AUTHENTICATION_FAILURE: 'auth_failure',
+    READY: 'ready',
+    MESSAGE_RECEIVED: 'message',
+    MESSAGE_CREATE: 'message_create',
+    MESSAGE_REVOKED_EVERYONE: 'message_revoke_everyone',
+    MESSAGE_REVOKED_ME: 'message_revoke_me',
+    MESSAGE_ACK: 'message_ack',
+    MEDIA_UPLOADED: 'media_uploaded',
+    GROUP_JOIN: 'group_join',
+    GROUP_LEAVE: 'group_leave',
+    GROUP_UPDATE: 'group_update',
+    QR_RECEIVED: 'qr',
+    DISCONNECTED: 'disconnected',
+    STATE_CHANGED: 'change_state',
+    BATTERY_CHANGED: 'change_battery',
+    INCOMING_CALL: 'incoming_call'
+  };
+  /**
+   * Message types
+   * @readonly
+   * @enum {string}
+   */
+
+  const MessageTypes = {
+    TEXT: 'chat',
+    AUDIO: 'audio',
+    VOICE: 'ptt',
+    IMAGE: 'image',
+    VIDEO: 'video',
+    DOCUMENT: 'document',
+    STICKER: 'sticker',
+    LOCATION: 'location',
+    CONTACT_CARD: 'vcard',
+    CONTACT_CARD_MULTI: 'multi_vcard',
+    ORDER: 'order',
+    REVOKED: 'revoked',
+    PRODUCT: 'product',
+    UNKNOWN: 'unknown',
+    GROUP_INVITE: 'groups_v4_invite',
+    LIST: 'list',
+    BUTTONS_RESPONSE: 'buttons_response',
+    PAYMENT: 'payment'
+  };
+
+  const ExposeStore = moduleRaid => {
+    window.mR = moduleRaid();
+    window.Store = Object.assign({}, window.mR.findModule('Chat').find(a => typeof a.default != 'undefined').default);
+    window.Store.AppState = window.mR.findModule('Socket')[0].Socket;
+    window.Store.Conn = window.mR.findModule('Conn').find(a => typeof a.Conn != 'undefined').Conn;
+    window.Store.BlockContact = window.mR.findModule('blockContact')[0];
+    window.Store.Call = window.mR.findModule('CallCollection')[0].CallCollection;
+    window.Store.Cmd = window.mR.findModule('Cmd')[0].Cmd;
+    window.Store.CryptoLib = window.mR.findModule('decryptE2EMedia')[0];
+    window.Store.DownloadManager = window.mR.findModule('downloadManager')[0].downloadManager;
+    window.Store.Features = window.mR.findModule('FEATURE_CHANGE_EVENT')[0].GK;
+    window.Store.genId = window.mR.findModule('randomId')[0].randomId;
+    window.Store.GroupMetadata = window.mR.findModule(module => module.default && module.default.handlePendingInvite)[0].default;
+    window.Store.Invite = window.mR.findModule('sendJoinGroupViaInvite')[0];
+    window.Store.Label = window.mR.findModule('LabelCollection')[0].default;
+    window.Store.MediaPrep = window.mR.findModule('MediaPrep')[0];
+    window.Store.MediaObject = window.mR.findModule('getOrCreateMediaObject')[0];
+    window.Store.NumberInfo = window.mR.findModule('formattedPhoneNumber')[0];
+    window.Store.MediaTypes = window.mR.findModule('msgToMediaType')[0];
+    window.Store.MediaUpload = window.mR.findModule('uploadMedia')[0];
+    window.Store.MsgKey = window.mR.findModule(module => module.default && module.default.fromString)[0].default;
+    window.Store.OpaqueData = window.mR.findModule(module => module.default && module.default.createFromData)[0].default;
+    window.Store.QueryExist = window.mR.findModule('queryExist')[0].queryExist;
+    window.Store.QueryProduct = window.mR.findModule('queryProduct')[0];
+    window.Store.QueryOrder = window.mR.findModule('queryOrder')[0];
+    window.Store.SendClear = window.mR.findModule('sendClear')[0];
+    window.Store.SendDelete = window.mR.findModule('sendDelete')[0];
+    window.Store.SendMessage = window.mR.findModule('addAndSendMsgToChat')[0];
+    window.Store.SendSeen = window.mR.findModule('sendSeen')[0];
+    window.Store.User = window.mR.findModule('getMaybeMeUser')[0];
+    window.Store.UploadUtils = window.mR.findModule(module => module.default && module.default.encryptAndUpload ? module.default : null)[0].default;
+    window.Store.UserConstructor = window.mR.findModule(module => module.default && module.default.prototype && module.default.prototype.isServer && module.default.prototype.isUser ? module.default : null)[0].default;
+    window.Store.Validators = window.mR.findModule('findLinks')[0];
+    window.Store.VCard = window.mR.findModule('vcardFromContactModel')[0];
+    window.Store.Wap = window.mR.findModule('queryLinkPreview')[0].default;
+    window.Store.WidFactory = window.mR.findModule('createWid')[0];
+    window.Store.getProfilePicFull = window.mR.findModule('getProfilePicFull')[0].getProfilePicFull;
+    window.Store.PresenceUtils = window.mR.findModule('sendPresenceAvailable')[0];
+    window.Store.ChatState = window.mR.findModule('sendChatStateComposing')[0];
+    window.Store.GroupParticipants = window.mR.findModule('sendPromoteParticipants')[0];
+    window.Store.GroupUtils = { ...window.mR.findModule('sendCreateGroup')[0],
+      ...window.mR.findModule('sendSetGroupSubject')[0]
+    };
+
+    if (!window.Store.Chat._find) {
+      window.Store.Chat._find = e => {
+        const target = window.Store.Chat.get(e);
+        return target ? Promise.resolve(target) : Promise.resolve({
+          id: e
+        });
+      };
+    }
+  };
+
+  const LoadUtils = () => {
+    window.WWebJS = {};
+
+    window.WWebJS.sendSeen = async chatId => {
+      let chat = window.Store.Chat.get(chatId);
+
+      if (chat !== undefined) {
+        await window.Store.SendSeen.sendSeen(chat, false);
+        return true;
+      }
+
+      return false;
+    };
+
+    window.WWebJS.sendMessage = async (chat, content, options = {}) => {
+      let attOptions = {};
+
+      if (options.attachment) {
+        attOptions = options.sendMediaAsSticker ? await window.WWebJS.processStickerData(options.attachment) : await window.WWebJS.processMediaData(options.attachment, {
+          forceVoice: options.sendAudioAsVoice,
+          forceDocument: options.sendMediaAsDocument,
+          forceGif: options.sendVideoAsGif
+        });
+        content = options.sendMediaAsSticker ? undefined : attOptions.preview;
+        delete options.attachment;
+        delete options.sendMediaAsSticker;
+      }
+
+      let quotedMsgOptions = {};
+
+      if (options.quotedMessageId) {
+        let quotedMessage = window.Store.Msg.get(options.quotedMessageId);
+
+        if (quotedMessage.canReply()) {
+          quotedMsgOptions = quotedMessage.msgContextInfo(chat);
+        }
+
+        delete options.quotedMessageId;
+      }
+
+      if (options.mentionedJidList) {
+        options.mentionedJidList = options.mentionedJidList.map(cId => window.Store.Contact.get(cId).id);
+      }
+
+      let locationOptions = {};
+
+      if (options.location) {
+        locationOptions = {
+          type: 'location',
+          loc: options.location.description,
+          lat: options.location.latitude,
+          lng: options.location.longitude
+        };
+        delete options.location;
+      }
+
+      let vcardOptions = {};
+
+      if (options.contactCard) {
+        let contact = window.Store.Contact.get(options.contactCard);
+        vcardOptions = {
+          body: window.Store.VCard.vcardFromContactModel(contact).vcard,
+          type: 'vcard',
+          vcardFormattedName: contact.formattedName
+        };
+        delete options.contactCard;
+      } else if (options.contactCardList) {
+        let contacts = options.contactCardList.map(c => window.Store.Contact.get(c));
+        let vcards = contacts.map(c => window.Store.VCard.vcardFromContactModel(c));
+        vcardOptions = {
+          type: 'multi_vcard',
+          vcardList: vcards,
+          body: undefined
+        };
+        delete options.contactCardList;
+      } else if (options.parseVCards && typeof content === 'string' && content.startsWith('BEGIN:VCARD')) {
+        delete options.parseVCards;
+
+        try {
+          const parsed = window.Store.VCard.parseVcard(content);
+
+          if (parsed) {
+            vcardOptions = {
+              type: 'vcard',
+              vcardFormattedName: window.Store.VCard.vcardGetNameFromParsed(parsed)
+            };
+          }
+        } catch (_) {// not a vcard
+        }
+      }
+
+      if (options.linkPreview) {
+        delete options.linkPreview; // const link = window.Store.Validators.findLink(content);
+        // if (link) {
+        //   const preview = await window.Store.Wap.queryLinkPreview(link.url);
+        //   preview.preview = true;
+        //   preview.subtype = 'url';
+        //   options = { ...options, ...preview };
+        // }
+      }
+
+      let extraOptions = {};
+
+      if (options.buttons) {
+        let caption;
+
+        if (options.buttons.type === 'chat') {
+          content = options.buttons.body;
+          caption = content;
+        } else {
+          caption = options.caption ? options.caption : ' '; //Caption can't be empty
+        }
+
+        extraOptions = {
+          productHeaderImageRejected: false,
+          isFromTemplate: false,
+          isDynamicReplyButtonsMsg: true,
+          title: options.buttons.title ? options.buttons.title : undefined,
+          footer: options.buttons.footer ? options.buttons.footer : undefined,
+          dynamicReplyButtons: options.buttons.buttons,
+          replyButtons: options.buttons.buttons,
+          caption: caption
+        };
+        delete options.buttons;
+      }
+
+      if (options.list) {
+        if (window.Store.Conn.platform === 'smba' || window.Store.Conn.platform === 'smbi') {
+          throw "[LT01] Whatsapp business can't send this yet";
+        }
+
+        extraOptions = { ...extraOptions,
+          type: 'list',
+          footer: options.list.footer,
+          list: { ...options.list,
+            listType: 1
+          },
+          body: options.list.description
+        };
+        delete options.list;
+        delete extraOptions.list.footer;
+      }
+
+      const newMsgId = new window.Store.MsgKey({
+        fromMe: true,
+        remote: chat.id,
+        id: window.Store.genId()
+      });
+      const message = { ...options,
+        id: newMsgId,
+        ack: 0,
+        body: content,
+        from: window.Store.User.getMeUser(),
+        to: chat.id,
+        local: true,
+        self: 'out',
+        t: parseInt(new Date().getTime() / 1000),
+        isNewMsg: true,
+        type: 'chat',
+        ...locationOptions,
+        ...attOptions,
+        ...quotedMsgOptions,
+        ...vcardOptions,
+        ...extraOptions
+      };
+      await window.Store.SendMessage.addAndSendMsgToChat(chat, message);
+      return window.Store.Msg.get(newMsgId._serialized);
+    };
+
+    window.WWebJS.processMediaData = async (mediaInfo, {
+      forceVoice,
+      forceDocument,
+      forceGif
+    }) => {
+      const file = window.WWebJS.mediaInfoToFile(mediaInfo);
+      const mData = await window.Store.OpaqueData.createFromData(file, file.type);
+      const mediaPrep = window.Store.MediaPrep.prepRawMedia(mData, {
+        asDocument: forceDocument
+      });
+      const mediaData = await mediaPrep.waitForPrep();
+      const mediaObject = window.Store.MediaObject.getOrCreateMediaObject(mediaData.filehash);
+      const mediaType = window.Store.MediaTypes.msgToMediaType({
+        type: mediaData.type,
+        isGif: mediaData.isGif
+      });
+
+      if (forceVoice && mediaData.type === 'audio') {
+        mediaData.type = 'ptt';
+      }
+
+      if (forceGif && mediaData.type === 'video') {
+        mediaData.isGif = true;
+      }
+
+      if (forceDocument) {
+        mediaData.type = 'document';
+      }
+
+      if (!(mediaData.mediaBlob instanceof window.Store.OpaqueData)) {
+        mediaData.mediaBlob = await window.Store.OpaqueData.createFromData(mediaData.mediaBlob, mediaData.mediaBlob.type);
+      }
+
+      mediaData.renderableUrl = mediaData.mediaBlob.url();
+      mediaObject.consolidate(mediaData.toJSON());
+      mediaData.mediaBlob.autorelease();
+      const uploadedMedia = await window.Store.MediaUpload.uploadMedia({
+        mimetype: mediaData.mimetype,
+        mediaObject,
+        mediaType
+      });
+      const mediaEntry = uploadedMedia.mediaEntry;
+
+      if (!mediaEntry) {
+        throw new Error('upload failed: media entry was not created');
+      }
+
+      mediaData.set({
+        clientUrl: mediaEntry.mmsUrl,
+        deprecatedMms3Url: mediaEntry.deprecatedMms3Url,
+        directPath: mediaEntry.directPath,
+        mediaKey: mediaEntry.mediaKey,
+        mediaKeyTimestamp: mediaEntry.mediaKeyTimestamp,
+        filehash: mediaObject.filehash,
+        encFilehash: mediaEntry.encFilehash,
+        uploadhash: mediaEntry.uploadHash,
+        size: mediaObject.size,
+        streamingSidecar: mediaEntry.sidecar,
+        firstFrameSidecar: mediaEntry.firstFrameSidecar
+      });
+      return mediaData;
+    };
+
+    window.WWebJS.getMessageModel = message => {
+      const msg = message.serialize();
+      msg.isStatusV3 = message.isStatusV3;
+      msg.links = message.getLinks().map(link => ({
+        link: link.href,
+        isSuspicious: Boolean(link.suspiciousCharacters && link.suspiciousCharacters.size)
+      }));
+
+      if (msg.buttons) {
+        msg.buttons = msg.buttons.serialize();
+      }
+
+      if (msg.dynamicReplyButtons) {
+        msg.dynamicReplyButtons = JSON.parse(JSON.stringify(msg.dynamicReplyButtons));
+      }
+
+      if (msg.replyButtons) {
+        msg.replyButtons = JSON.parse(JSON.stringify(msg.replyButtons));
+      }
+
+      delete msg.pendingAckUpdate;
+      return msg;
+    };
+
+    window.WWebJS.getChatModel = async chat => {
+      let res = chat.serialize();
+      res.isGroup = chat.isGroup;
+      res.formattedTitle = chat.formattedTitle;
+      res.isMuted = chat.mute && chat.mute.isMuted;
+
+      if (chat.groupMetadata) {
+        const chatWid = window.Store.WidFactory.createWid(chat.id._serialized);
+        await window.Store.GroupMetadata.update(chatWid);
+        res.groupMetadata = chat.groupMetadata.serialize();
+      }
+
+      delete res.msgs;
+      delete res.msgUnsyncedButtonReplyMsgs;
+      delete res.unsyncedButtonReplies;
+      return res;
+    };
+
+    window.WWebJS.getChat = async chatId => {
+      const chatWid = window.Store.WidFactory.createWid(chatId);
+      const chat = await window.Store.Chat.find(chatWid);
+      return await window.WWebJS.getChatModel(chat);
+    };
+
+    window.WWebJS.getContactModel = contact => {
+      let res = contact.serialize();
+      res.isBusiness = contact.isBusiness;
+
+      if (contact.businessProfile) {
+        res.businessProfile = contact.businessProfile.serialize();
+      }
+
+      res.isMe = contact.isMe;
+      res.isUser = contact.isUser;
+      res.isGroup = contact.isGroup;
+      res.isWAContact = contact.isWAContact;
+      res.isMyContact = contact.isMyContact;
+      res.isBlocked = contact.isContactBlocked;
+      res.userid = contact.userid;
+      return res;
+    };
+
+    window.WWebJS.getContact = async contactId => {
+      const wid = window.Store.WidFactory.createWid(contactId);
+      const contact = await window.Store.Contact.find(wid);
+      return window.WWebJS.getContactModel(contact);
+    };
+
+    window.WWebJS.getContacts = () => {
+      const contacts = window.Store.Contact.models;
+      return contacts.map(contact => window.WWebJS.getContactModel(contact));
+    };
+
+    window.WWebJS.mediaInfoToFile = ({
+      data,
+      mimetype,
+      filename
+    }) => {
+      const binaryData = atob(data);
+      const buffer = new ArrayBuffer(binaryData.length);
+      const view = new Uint8Array(buffer);
+
+      for (let i = 0; i < binaryData.length; i++) {
+        view[i] = binaryData.charCodeAt(i);
+      }
+
+      const blob = new Blob([buffer], {
+        type: mimetype
+      });
+      return new File([blob], filename, {
+        type: mimetype,
+        lastModified: Date.now()
+      });
+    };
+
+    window.WWebJS.arrayBufferToBase64 = arrayBuffer => {
+      let binary = '';
+      const bytes = new Uint8Array(arrayBuffer);
+      const len = bytes.byteLength;
+
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+
+      return window.btoa(binary);
+    };
+
+    window.WWebJS.getFileHash = async data => {
+      let buffer = await data.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+    };
+
+    window.WWebJS.generateHash = async length => {
+      var result = '';
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var charactersLength = characters.length;
+
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+
+      return result;
+    };
+
+    window.WWebJS.sendClearChat = async chatId => {
+      let chat = window.Store.Chat.get(chatId);
+
+      if (chat !== undefined) {
+        await window.Store.SendClear.sendClear(chat, false);
+        return true;
+      }
+
+      return false;
+    };
+
+    window.WWebJS.sendDeleteChat = async chatId => {
+      let chat = window.Store.Chat.get(chatId);
+
+      if (chat !== undefined) {
+        await window.Store.SendDelete.sendDelete(chat);
+        return true;
+      }
+
+      return false;
+    };
+
+    window.WWebJS.sendChatstate = async (state, chatId) => {
+      switch (state) {
+        case 'typing':
+          await window.Store.Wap.sendChatstateComposing(chatId);
+          break;
+
+        case 'recording':
+          await window.Store.Wap.sendChatstateRecording(chatId);
+          break;
+
+        case 'stop':
+          await window.Store.Wap.sendChatstatePaused(chatId);
+          break;
+
+        default:
+          throw 'Invalid chatstate';
+      }
+
+      return true;
+    };
+
+    window.WWebJS.getLabelModel = label => {
+      let res = label.serialize();
+      res.hexColor = label.hexColor;
+      return res;
+    };
+
+    window.WWebJS.getLabels = () => {
+      const labels = window.Store.Label.models;
+      return labels.map(label => window.WWebJS.getLabelModel(label));
+    };
+
+    window.WWebJS.getLabel = labelId => {
+      const label = window.Store.Label.get(labelId);
+      return window.WWebJS.getLabelModel(label);
+    };
+
+    window.WWebJS.getChatLabels = async chatId => {
+      const chat = await window.WWebJS.getChat(chatId);
+      return (chat.labels || []).map(id => window.WWebJS.getLabel(id));
+    };
+
+    window.WWebJS.getOrderDetail = async (orderId, token) => {
+      return window.Store.QueryOrder.queryOrder(orderId, 80, 80, token);
+    };
+
+    window.WWebJS.getProductMetadata = async productId => {
+      let sellerId = window.Store.Conn.wid;
+      let product = await window.Store.QueryProduct.queryProduct(sellerId, productId);
+
+      if (product && product.data) {
+        return product.data;
+      }
+
+      return undefined;
+    };
+  };
+
+  class Base {
+    constructor(client) {
+      /**
+       * The client that instantiated this
+       * @readonly
+       */
+      Object.defineProperty(this, 'client', {
+        value: client
+      });
+    }
+
+    _clone() {
+      return Object.assign(Object.create(this), this);
+    }
+
+    _patch(data) {
+      return data;
+    }
+
+  }
+
+  /**
+   * ID that represents a contact
+   * @typedef {Object} ContactId
+   * @property {string} server
+   * @property {string} user
+   * @property {string} _serialized
+   */
+
+  /**
+   * Represents a Contact on WhatsApp
+   * @extends {Base}
+   */
+
+  class Contact extends Base {
+    constructor(client, data) {
+      super(client);
+      if (data) this._patch(data);
+    }
+
+    _patch(data) {
+      /**
+       * ID that represents the contact
+       * @type {ContactId}
+       */
+      this.id = data.id;
+      /**
+       * Contact's phone number
+       * @type {string}
+       */
+
+      this.number = data.userid;
+      /**
+       * Indicates if the contact is a business contact
+       * @type {boolean}
+       */
+
+      this.isBusiness = data.isBusiness;
+      /**
+       * Indicates if the contact is an enterprise contact
+       * @type {boolean}
+       */
+
+      this.isEnterprise = data.isEnterprise;
+      this.labels = data.labels;
+      /**
+       * The contact's name, as saved by the current user
+       * @type {?string}
+       */
+
+      this.name = data.name;
+      /**
+       * The name that the contact has configured to be shown publically
+       * @type {string}
+       */
+
+      this.pushname = data.pushname;
+      this.sectionHeader = data.sectionHeader;
+      /**
+       * A shortened version of name
+       * @type {?string}
+       */
+
+      this.shortName = data.shortName;
+      this.statusMute = data.statusMute;
+      this.type = data.type;
+      this.verifiedLevel = data.verifiedLevel;
+      this.verifiedName = data.verifiedName;
+      /**
+       * Indicates if the contact is the current user's contact
+       * @type {boolean}
+       */
+
+      this.isMe = data.isMe;
+      /**
+       * Indicates if the contact is a user contact
+       * @type {boolean}
+       */
+
+      this.isUser = data.isUser;
+      /**
+       * Indicates if the contact is a group contact
+       * @type {boolean}
+       */
+
+      this.isGroup = data.isGroup;
+      /**
+       * Indicates if the number is registered on WhatsApp
+       * @type {boolean}
+       */
+
+      this.isWAContact = data.isWAContact;
+      /**
+       * Indicates if the number is saved in the current phone's contacts
+       * @type {boolean}
+       */
+
+      this.isMyContact = data.isMyContact;
+      /**
+       * Indicates if you have blocked this contact
+       * @type {boolean}
+       */
+
+      this.isBlocked = data.isBlocked;
+      return super._patch(data);
+    }
+    /**
+     * Returns the contact's profile picture URL, if privacy settings allow it
+     * @returns {Promise<string>}
+     */
+
+
+    async getProfilePicUrl() {
+      return await this.client.getProfilePicUrl(this.id._serialized);
+    }
+    /**
+     * Gets the Contact's current "about" info. Returns null if you don't have permission to read their status.
+     * @returns {Promise<?string>}
+     */
+
+
+    async getAbout() {
+      const about = await window.Store.Wap.statusFind(this.id._serialized);
+      if (typeof about.status !== 'string') return null;
+      return about.status;
+    }
+
+  }
+
+  /**
+   * Represents a Private Contact on WhatsApp
+   * @extends {Contact}
+   */
+
+  class PrivateContact extends Contact {}
+
+  /**
+   * Represents a Business Contact on WhatsApp
+   * @extends {Contact}
+   */
+
+  class BusinessContact extends Contact {
+    _patch(data) {
+      /**
+       * The contact's business profile
+       */
+      this.businessProfile = data.businessProfile;
+      return super._patch(data);
+    }
+
+  }
+
+  class ContactFactory {
+    static create(client, data) {
+      if (data.isBusiness) {
+        return new BusinessContact(client, data);
+      }
+
+      return new PrivateContact(client, data);
+    }
+
+  }
+
+  /**
+   * Current connection information
+   * @extends {Base}
+   */
+
+  class ClientInfo extends Base {
+    constructor(client, data) {
+      super(client);
+      if (data) this._patch(data);
+    }
+
+    _patch(data) {
+      /**
+       * Name configured to be shown in push notifications
+       * @type {string}
+       */
+      this.pushname = data.pushname;
+      /**
+       * Current user ID
+       * @type {object}
+       */
+
+      this.wid = data.wid;
+      /**
+       * @type {object}
+       * @deprecated Use .wid instead
+       */
+
+      this.me = data.wid;
+      /**
+       * Platform the phone is running on
+       * @type {string}
+       */
+
+      this.platform = data.platform;
+      return super._patch(data);
+    }
+
+  }
+
+  /**
+   * Location information
+   */
+  class Location {
+    /**
+     * @param {number} latitude
+     * @param {number} longitude
+     * @param {?string} description
+     */
+    constructor(latitude, longitude, description) {
+      /**
+       * Location latitude
+       * @type {number}
+       */
+      this.latitude = latitude;
+      /**
+       * Location longitude
+       * @type {number}
+       */
+
+      this.longitude = longitude;
+      /**
+       * Name for the location
+       * @type {?string}
+       */
+
+      this.description = description;
+    }
+
+  }
+
+  /**
+   * Media attached to a message
+   * @param {string} mimetype MIME type of the attachment
+   * @param {string} data Base64-encoded data of the file
+   * @param {?string} filename Document file name
+   */
+  class MessageMedia {
+    constructor(mimetype, data, filename) {
+      /**
+       * MIME type of the attachment
+       * @type {string}
+       */
+      this.mimetype = mimetype;
+      /**
+       * Base64 encoded data that represents the file
+       * @type {string}
+       */
+
+      this.data = data;
+      /**
+       * Name of the file (for documents)
+       * @type {?string}
+       */
+
+      this.filename = filename;
+    }
+
+  }
+
+  /**
+   * Represents a Message on WhatsApp
+   * @extends {Base}
+   */
+
+  class Message extends Base {
+    constructor(client, data) {
+      super(client);
+      if (data) this._patch(data);
+    }
+
+    _patch(data) {
+      /**
+       * MediaKey that represents the sticker 'ID'
+       * @type {string}
+       */
+      this.mediaKey = data.mediaKey;
+      /**
+       * ID that represents the message
+       * @type {object}
+       */
+
+      this.id = data.id;
+      /**
+       * ACK status for the message
+       * @type {MessageAck}
+       */
+
+      this.ack = data.ack;
+      /**
+       * Indicates if the message has media available for download
+       * @type {boolean}
+       */
+
+      this.hasMedia = data.clientUrl || data.deprecatedMms3Url ? true : false;
+      /**
+       * Message content
+       * @type {string}
+       */
+
+      this.body = this.hasMedia ? data.caption || '' : data.body || '';
+      /**
+       * Message type
+       * @type {MessageTypes}
+       */
+
+      this.type = data.type;
+      /**
+       * Unix timestamp for when the message was created
+       * @type {number}
+       */
+
+      this.timestamp = data.t;
+      /**
+       * ID for the Chat that this message was sent to, except if the message was sent by the current user.
+       * @type {string}
+       */
+
+      this.from = typeof data.from === 'object' && data.from !== null ? data.from._serialized : data.from;
+      /**
+       * ID for who this message is for.
+       *
+       * If the message is sent by the current user, it will be the Chat to which the message is being sent.
+       * If the message is sent by another user, it will be the ID for the current user.
+       * @type {string}
+       */
+
+      this.to = typeof data.to === 'object' && data.to !== null ? data.to._serialized : data.to;
+      /**
+       * If the message was sent to a group, this field will contain the user that sent the message.
+       * @type {string}
+       */
+
+      this.author = typeof data.author === 'object' && data.author !== null ? data.author._serialized : data.author;
+      /**
+       * Indicates if the message was forwarded
+       * @type {boolean}
+       */
+
+      this.isForwarded = data.isForwarded;
+      /**
+       * Indicates if the message is a status update
+       * @type {boolean}
+       */
+
+      this.isStatus = data.isStatusV3;
+      /**
+       * Indicates if the message was starred
+       * @type {boolean}
+       */
+
+      this.isStarred = data.star;
+      /**
+       * Indicates if the message was a broadcast
+       * @type {boolean}
+       */
+
+      this.broadcast = data.broadcast;
+      /**
+       * Indicates if the message was sent by the current user
+       * @type {boolean}
+       */
+
+      this.fromMe = data.id.fromMe;
+      /**
+       * Indicates if the message was sent as a reply to another message.
+       * @type {boolean}
+       */
+
+      this.hasQuotedMsg = data.quotedMsg ? true : false;
+      /**
+       * Location information contained in the message, if the message is type "location"
+       * @type {Location}
+       */
+
+      this.location = data.type === MessageTypes.LOCATION ? new Location(data.lat, data.lng, data.loc) : undefined;
+      /**
+       * List of vCards contained in the message.
+       * @type {Array<string>}
+       */
+
+      this.vCards = data.type === MessageTypes.CONTACT_CARD_MULTI ? data.vcardList.map(c => c.vcard) : data.type === MessageTypes.CONTACT_CARD ? [data.body] : [];
+      /**
+       * Indicates the mentions in the message body.
+       * @type {Array<string>}
+       */
+
+      this.mentionedIds = [];
+
+      if (data.mentionedJidList) {
+        this.mentionedIds = data.mentionedJidList;
+      }
+      /**
+       * Links included in the message.
+       * @type {Array<string>}
+       */
+
+
+      this.links = data.links;
+      return super._patch(data);
+    }
+
+    _getChatId() {
+      return this.fromMe ? this.to : this.from;
+    }
+    /**
+     * Returns the Contact this message was sent from
+     * @returns {Promise<Contact>}
+     */
+
+
+    getContact() {
+      return this.client.getContactById(this.author || this.from);
+    }
+    /**
+     * Returns the Contacts mentioned in this message
+     * @returns {Promise<Array<Contact>>}
+     */
+
+
+    async getMentions() {
+      return await Promise.all(this.mentionedIds.map(async m => await this.client.getContactById(m)));
+    }
+    /**
+     * Returns the quoted message, if any
+     * @returns {Promise<Message>}
+     */
+
+
+    async getQuotedMessage() {
+      if (!this.hasQuotedMsg) return undefined;
+      let msg = window.Store.Msg.get(this.id._serialized);
+      const quotedMsg = msg.quotedMsgObj().serialize(); // const quotedMsg = await this.client.pupPage.evaluate((msgId) => {
+      //   let msg = window.Store.Msg.get(msgId);
+      //   return msg.quotedMsgObj().serialize();
+      // }, this.id._serialized);
+
+      return new Message(this.client, quotedMsg);
+    }
+    /**
+     * Sends a message as a reply to this message. If chatId is specified, it will be sent
+     * through the specified Chat. If not, it will send the message
+     * in the same Chat as the original message was sent.
+     *
+     * @param {string|MessageMedia|Location} content
+     * @param {string} [chatId]
+     * @param {MessageSendOptions} [options]
+     * @returns {Promise<Message>}
+     */
+
+
+    async reply(content, chatId, options = {}) {
+      if (!chatId) {
+        chatId = this._getChatId();
+      }
+
+      options = { ...options,
+        quotedMessageId: this.id._serialized
+      };
+      return this.client.sendMessage(chatId, content, options);
+    }
+
+  }
+
+  class Client extends EventEmitter {
+    constructor() {
+      super();
+    }
+
+    async initialize() {
+      await ExposeStore(moduleRaid);
+      LoadUtils();
+      this.info = new ClientInfo(this, { ...window.Store.Conn.serialize(),
+        wid: window.Store.User.getMeUser()
+      });
+
+      window.onAddMessageEvent = msg => {
+        if (!msg.isNewMsg) return;
+        const message = new Message(this, msg);
+        if (msg.id.fromMe) return;
+        /**
+         * Emitted when a new message is received.
+         * @event Client#message
+         * @param {Message} message The message that was received
+         */
+
+        this.emit(Events.MESSAGE_RECEIVED, message);
+      };
+
+      window.Store.Msg.on('add', msg => {
+        if (msg.isNewMsg) window.onAddMessageEvent(window.WWebJS.getMessageModel(msg));
+      });
+      /**
+       * Emitted when the client has initialized and is ready to receive messages.
+       * @event Client#ready
+       */
+
+      setTimeout(() => {
+        this.emit(Events.READY);
+      }, 2000);
+    }
+    /**
+     * Mark as seen for the Chat
+     *  @param {string} chatId
+     *  @returns {Promise<boolean>} result
+     *
+     */
+
+
+    async sendSeen(chatId) {
+      const result = await window.WWebJS.sendSeen(chatId);
+      return result;
+    }
+    /**
+     * Message options.
+     * @typedef {Object} MessageSendOptions
+     * @property {boolean} [linkPreview=true] - Show links preview
+     * @property {boolean} [sendAudioAsVoice=false] - Send audio as voice message
+     * @property {boolean} [sendMediaAsSticker=false] - Send media as a sticker
+     * @property {boolean} [sendMediaAsDocument=false] - Send media as a document
+     * @property {boolean} [parseVCards=true] - Automatically parse vCards and send them as contacts
+     * @property {string} [caption] - Image or video caption
+     * @property {string} [quotedMessageId] - Id of the message that is being quoted (or replied to)
+     * @property {Contact[]} [mentions] - Contacts that are being mentioned in the message
+     * @property {boolean} [sendSeen=true] - Mark the conversation as seen after sending the message
+     * @property {MessageMedia} [media] - Media to be sent
+     */
+
+    /**
+     * Send a message to a specific chatId
+     * @param {string} chatId
+     * @param {string|MessageMedia|Location|Contact|Array<Contact>} content
+     * @param {MessageSendOptions} [options] - Options used when sending the message
+     *
+     * @returns {Promise<Message>} Message that was just sent
+     */
+
+
+    async sendMessage(chatId, content, options = {}) {
+      let internalOptions = {
+        linkPreview: true,
+        sendAudioAsVoice: options.sendAudioAsVoice,
+        sendMediaAsSticker: options.sendMediaAsSticker,
+        sendMediaAsDocument: options.sendMediaAsDocument,
+        caption: options.caption,
+        quotedMessageId: options.quotedMessageId,
+        parseVCards: options.parseVCards === false ? false : true,
+        mentionedJidList: Array.isArray(options.mentions) ? options.mentions.map(contact => contact.id._serialized) : []
+      };
+      const sendSeen = typeof options.sendSeen === 'undefined' ? true : options.sendSeen;
+
+      if (content instanceof MessageMedia) {
+        internalOptions.attachment = content;
+        content = '';
+      } else if (options.media instanceof MessageMedia) {
+        internalOptions.attachment = options.media;
+        internalOptions.caption = content;
+        content = '';
+      } else if (content instanceof Location) {
+        internalOptions.location = content;
+        content = '';
+      }
+
+      const chatWid = window.Store.WidFactory.createWid(chatId);
+      const chat = await window.Store.Chat.find(chatWid);
+
+      if (sendSeen) {
+        window.WWebJS.sendSeen(chatId);
+      }
+
+      const msg = await window.WWebJS.sendMessage(chat, content, internalOptions, sendSeen);
+      const newMessage = msg.serialize();
+      return new Message(this, newMessage);
+    }
+    /**
+     * Get contact instance by ID
+     * @param {string} contactId
+     * @returns {Promise<Contact>}
+     */
+
+
+    async getContactById(contactId) {
+      let contact = await window.WWebJS.getContact(contactId);
+      return ContactFactory.create(this, contact);
+    }
+    /**
+     * Returns the contact ID's profile picture URL, if privacy settings allow it
+     * @param {string} contactId the whatsapp user's ID
+     * @returns {Promise<string>}
+     */
+
+
+    async getProfilePicUrl(contactId) {
+      const chatWid = await window.Store.WidFactory.createWid(contactId);
+      const profilePic = await window.Store.getProfilePicFull(chatWid);
+      return profilePic ? profilePic.eurl : undefined;
+    }
+
+  }
+
+  async function sendText(event) {
+    try {
+      const options = {};
+
+      if (!!event.detail.quotedMessageId) {
+        options.quotedMessageId = event.detail.quotedMessageId;
+      }
+
+      const message = await window.waClient.sendMessage(`${event.detail.number}@c.us`, event.detail.text, options);
+      window.emit("send-text@response", {
+        success: true,
+        id: message.id._serialized
+      });
+    } catch (err) {
+      window.emit("send-text@response", {
+        success: false,
+        error: err.toString(),
+        message: "Erro ao enviar mensagem na extensão"
+      });
+    }
+  }
+  async function sendLocation(event) {
+    try {
+      const location = new Location(parseFloat(event.detail.location.lat), parseFloat(event.detail.location.lng), event.detail.location.description);
+      const message = await window.waClient.sendMessage(`${event.detail.number}@c.us`, location);
+      window.emit("send-location@response", {
+        success: true,
+        id: message.id._serialized
+      });
+    } catch (err) {
+      window.emit("send-location@response", {
+        success: false,
+        error: err.toString(),
+        message: "Erro ao enviar mensagem na extensão"
+      });
+    }
+  }
+  async function sendVideo(event) {
+    try {
+      const video = new MessageMedia(event.detail.video.mimetype, event.detail.video.data, event.detail.video.filename);
+      const message = await window.waClient.sendMessage(`${event.detail.number}@c.us`, video);
+      window.emit("send-video@response", {
+        success: true,
+        id: message.id._serialized
+      });
+    } catch (err) {
+      window.emit("send-video@response", {
+        success: false,
+        error: err.toString(),
+        message: "Erro ao enviar mensagem na extensão"
+      });
+    }
+  }
+  async function sendImage(event) {
+    try {
+      const image = new MessageMedia(event.detail.image.mimetype, event.detail.image.data, event.detail.image.filename);
+      const message = await window.waClient.sendMessage(`${event.detail.number}@c.us`, image);
+      window.emit("send-image@response", {
+        success: true,
+        id: message.id._serialized
+      });
+    } catch (err) {
+      window.emit("send-image@response", {
+        success: false,
+        error: err.toString(),
+        message: "Erro ao enviar mensagem na extensão"
+      });
+    }
+  }
+  async function getProfileInfo(event) {
+    try {
+      const contact = await window.waClient.getContactById(`${event.detail.number}@c.us`);
+      const pic = await contact.getProfilePicUrl();
+      window.emit("contact-info@response", {
+        success: true,
+        pushname: contact.pushname || "",
+        name: contact.name || "",
+        shortName: contact.shortName || "",
+        pictureUrl: pic || ""
+      });
+    } catch (error) {
+      window.emit("contact-info@response", {
+        success: false,
+        error: error.toString(),
+        message: "Erro ao buscar dados do contato"
+      });
+    }
+  }
+
+  const VERSION = "2.1.0";
+
+  window.emit = (name, data) => {
+    window.dispatchEvent(new CustomEvent(name, {
+      detail: data
+    }));
+  };
+
+  const client = new Client();
+
+  function buildDataExtension() {
+    window.emit("wa-info@response", client.info.wid);
+  }
+
+  const registerEvents = () => {
+    window.addEventListener("wa-info", buildDataExtension, false);
+    window.addEventListener("send-text", sendText, false);
+    window.addEventListener("send-location", sendLocation, false);
+    window.addEventListener("send-image", sendImage, false);
+    window.addEventListener("send-video", sendVideo, false);
+    window.addEventListener("contact-info", getProfileInfo, false);
+  };
+
+  client.on("ready", () => {
+    window.waClient = client;
+    registerEvents();
+    console.log(`INITIALIZE WA LIBRARY ${VERSION} ✅`);
+    window.emit("wa-build", VERSION);
+  });
+  client.initialize();
+
+})();
