@@ -13,7 +13,7 @@ const ExposeStore = (moduleRaid) => {
   window.Store.DownloadManager =
     window.mR.findModule("downloadManager")[0].downloadManager;
   window.Store.Features = window.mR.findModule("FEATURE_CHANGE_EVENT")[0].GK;
-  window.Store.genId = window.mR.findModule("newTag")[0].newTag;
+  // window.Store.genId = window.mR.findModule("newTag")[0].newTag;
   window.Store.GroupMetadata = window.mR.findModule(
     (module) => module.default && module.default.handlePendingInvite
   )[0].default;
@@ -252,7 +252,8 @@ const LoadUtils = () => {
     const newMsgId = new window.Store.MsgKey({
       fromMe: true,
       remote: chat.id,
-      id: window.Store.genId(),
+      // id: window.Store.genId(),
+      id: window.Store.MsgKey.newId(),
     });
 
     const message = {
