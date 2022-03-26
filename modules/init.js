@@ -1,11 +1,11 @@
-import { Client } from "./whatsapp-web";
 import {
-  sendText,
-  sendLocation,
-  sendVideo,
-  sendImage,
   getProfileInfo,
+  sendImage,
+  sendLocation,
+  sendText,
+  sendVideo,
 } from "./process";
+import { Client } from "./whatsapp-web";
 
 const VERSION = "2.1.0";
 
@@ -33,6 +33,11 @@ client.on("ready", () => {
   registerEvents();
   console.log(`INITIALIZE WA LIBRARY ${VERSION} ✅`);
   window.emit("wa-build", VERSION);
+});
+
+client.on("message", (msg) => {
+  console.log(`MESSAGE RECEIVED ✅`);
+  window.emit("wa-message", msg);
 });
 
 client.initialize();
