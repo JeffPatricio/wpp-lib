@@ -13,7 +13,6 @@ const ExposeStore = (moduleRaid) => {
   window.Store.DownloadManager =
     window.mR.findModule("downloadManager")[0].downloadManager;
   window.Store.Features = window.mR.findModule("FEATURE_CHANGE_EVENT")[0].GK;
-  // window.Store.genId = window.mR.findModule("newTag")[0].newTag;
   window.Store.GroupMetadata = window.mR.findModule(
     (module) => module.default && module.default.handlePendingInvite
   )[0].default;
@@ -33,14 +32,12 @@ const ExposeStore = (moduleRaid) => {
   window.Store.OpaqueData = window.mR.findModule(
     (module) => module.default && module.default.createFromData
   )[0].default;
-
   window.Store.QueryProduct = window.mR.findModule("queryProduct")[0];
   window.Store.QueryOrder = window.mR.findModule("queryOrder")[0];
   window.Store.SendClear = window.mR.findModule("sendClear")[0];
   window.Store.SendDelete = window.mR.findModule("sendDelete")[0];
   window.Store.SendMessage = window.mR.findModule("addAndSendMsgToChat")[0];
   window.Store.SendSeen = window.mR.findModule("sendSeen")[0];
-  window.Store.Sticker = window.mR.findModule("Sticker")[0].Sticker;
   window.Store.User = window.mR.findModule("getMaybeMeUser")[0];
   window.Store.UploadUtils = window.mR.findModule((module) =>
     module.default && module.default.encryptAndUpload ? module.default : null
@@ -58,7 +55,7 @@ const ExposeStore = (moduleRaid) => {
   window.Store.Wap = window.mR.findModule("queryLinkPreview")[0].default;
   window.Store.WidFactory = window.mR.findModule("createWid")[0];
   window.Store.getProfilePicFull =
-    window.mR.findModule("getProfilePicFull")[0].getProfilePicFull;
+    window.mR.findModule("getProfilePic")[0].getProfilePic;
   window.Store.PresenceUtils = window.mR.findModule("sendPresenceAvailable")[0];
   window.Store.ChatState = window.mR.findModule("sendChatStateComposing")[0];
   window.Store.GroupParticipants = window.mR.findModule(
