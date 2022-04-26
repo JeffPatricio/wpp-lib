@@ -7,7 +7,7 @@ import {
   getProfileInfo,
 } from "./process";
 
-const VERSION = "2.1.0";
+const VERSION = "2.1.1";
 
 window.emit = (name, data) => {
   window.dispatchEvent(new CustomEvent(name, { detail: data }));

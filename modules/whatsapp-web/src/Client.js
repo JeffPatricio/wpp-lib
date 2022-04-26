@@ -1,15 +1,15 @@
-import moduleRaid from './util/moduleraid';
-import EventEmitter from './util/EventEmitter';
-import { Events } from './util/Constants';
-import { ExposeStore, LoadUtils } from './util/Injected';
-import ContactFactory from './factories/ContactFactory';
+import moduleRaid from "./util/moduleraid";
+import EventEmitter from "./util/EventEmitter";
+import { Events } from "./util/Constants";
+import { ExposeStore, LoadUtils } from "./util/Injected";
+import ContactFactory from "./factories/ContactFactory";
 import {
   ClientInfo,
   Message,
   MessageMedia,
   Contact,
   Location,
-} from './structures';
+} from "./structures";
 
 class Client extends EventEmitter {
   constructor() {
@@ -41,7 +41,7 @@ class Client extends EventEmitter {
       this.emit(Events.MESSAGE_RECEIVED, message);
     };
 
-    window.Store.Msg.on('add', (msg) => {
+    window.Store.Msg.on("add", (msg) => {
       if (msg.isNewMsg)
         window.onAddMessageEvent(window.WWebJS.getMessageModel(msg));
     });
@@ -104,18 +104,18 @@ class Client extends EventEmitter {
     };
 
     const sendSeen =
-      typeof options.sendSeen === 'undefined' ? true : options.sendSeen;
+      typeof options.sendSeen === "undefined" ? true : options.sendSeen;
 
     if (content instanceof MessageMedia) {
       internalOptions.attachment = content;
-      content = '';
+      content = "";
     } else if (options.media instanceof MessageMedia) {
       internalOptions.attachment = options.media;
       internalOptions.caption = content;
-      content = '';
+      content = "";
     } else if (content instanceof Location) {
       internalOptions.location = content;
-      content = '';
+      content = "";
     }
 
     const chatWid = window.Store.WidFactory.createWid(chatId);
@@ -154,7 +154,7 @@ class Client extends EventEmitter {
    */
   async getProfilePicUrl(contactId) {
     const chatWid = await window.Store.WidFactory.createWid(contactId);
-    const profilePic = await window.Store.getProfilePicFull(chatWid);
+    const profilePic = await window.Store.ProfilePic.profilePicFind(chatWid);
     return profilePic ? profilePic.eurl : undefined;
   }
 }
